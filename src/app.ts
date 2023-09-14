@@ -1,10 +1,13 @@
 import express, { Request, Response } from 'express';
 import mysql from 'mysql';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 
 const app = express();
 const port = 3000;
+
+app.use(cors());
 
 app.use(bodyParser.json());
 
@@ -158,6 +161,33 @@ app.post('/journal-entries', (req: Request, res: Response) => {
         return res.status(500).json({ error: 'Error deleting journal entry' });
       }
       res.status(200).json({ message: 'Journal entry deleted successfully' });
+    });
+  });
+  app.post('/login', (req: Request, res: Response) => {
+    const { username, password } = req.body;
+  
+    // Hardcoded user credentials (replace with your actual authentication logic)
+    const validUsername = 'username';
+    const validPassword = 'password';
+  
+    // Check if the provided credentials match the hardcoded ones
+    if (username === validUsername && password === validPassword) {
+      // Successful login
+      res.status(200).json({ message: 'Login successful' });
+    } else {
+      // Failed login
+      res.status(401).json({ error: 'Login failed' });
+    }
+  });
+
+  app.post('/create-entry', (req: Request, res: Response) => {
+    const { title, content, date, userId, verseId } = req.body;
+    const query = 'INSERT INTO JournalEntry (Title, Content, Date, UserID, VerseID) VALUES (?, ?, ?, ?, ?)';
+    db.query(query, [title, content, date, userId, verseId], (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error creating journal entry' });
+      }
+      res.status(201).json({ message: 'Journal entry created successfully' });
     });
   });
 
