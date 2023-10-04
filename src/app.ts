@@ -142,15 +142,22 @@ app.post('/journal-entries', (req: Request, res: Response) => {
   // Update a journal entry
   app.put('/journal-entries/:id', (req: Request, res: Response) => {
     const entryId = req.params.id;
-    const { title, content, date, userId, verseId } = req.body;
-    const query = 'UPDATE JournalEntry SET Title = ?, Content = ?, Date = ?, UserID = ?, VerseID = ? WHERE EntryID = ?';
-    db.query(query, [title, content, date, userId, verseId, entryId], (err) => {
+    const { title, content, date } = req.body;
+  
+    // Validate that required fields are present
+    if (!title || !content || !date) {
+      return res.status(400).json({ error: 'Missing required data' });
+    }
+  
+    const query = 'UPDATE JournalEntry SET Title = ?, Content = ?, Date = ? WHERE EntryID = ?';
+    db.query(query, [title, content, date, entryId], (err) => {
       if (err) {
         return res.status(500).json({ error: 'Error updating journal entry' });
       }
       res.status(200).json({ message: 'Journal entry updated successfully' });
     });
   });
+  
   
   // Delete a journal entry
   app.delete('/journal-entries/:id', (req: Request, res: Response) => {
